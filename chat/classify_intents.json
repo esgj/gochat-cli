@@ -1,0 +1,17 @@
+[
+  {
+    "intent": "greeting",
+    "words": ["hey", "how are you?", "who are you?"]
+  },
+  {
+    "intent": "weather",
+    "words": [
+      "how is the weather",
+      "weather",
+      "cold",
+      "hot",
+      "warm",
+      "freezing"
+    ]
+  }
+]

@@ -1,0 +1,51 @@
+[
+  {
+    "name": "greeting",
+    "steps": [
+      {
+        "match": [],
+        "responses": [
+          "Hello, I'm the Appio Chatbot! Not very clever but I can answer simple questions."
+        ],
+        "fallback": []
+      },
+      {
+        "match": [
+          "hi",
+          "hello",
+          "how are you",
+          "what is up",
+          "what are you doing"
+        ],
+        "responses": [
+          "Hello there!",
+          "Hi!",
+          "I'm fine, thanks.",
+          "Not much, just chilling in the binary world.",
+          "Crunching numbers all day, every day."
+        ],
+        "fallback": ["Sorry I didn't catch that"]
+      }
+    ]
+  },
+  {
+    "name": "weather",
+    "steps": [
+      {
+        "match": [
+          "How is the weather like now?",
+          "Weather right now",
+          "how is the weather tomorrow",
+          "is it going to rain today?"
+        ],
+        "responses": [
+          "I'm not really sure, I cannot check yet.",
+          "Sorry, I can't find that type of information right now.",
+          "I can't answer that question, sorry.",
+          "I'm not sure."
+        ],
+        "fallback": ["Sorry I didn't catch that, please try another question."]
+      }
+    ]
+  }
+]
