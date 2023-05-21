@@ -1,7 +1,7 @@
 [
   {
     "name": "greeting",
-    "defaultResponse": "Hello, I'm the Appio Chatbot! Not very clever but I can answer simple questions.",
+    "defaultResponse": "Hi, I'm the Gochat bot! Not very clever but I can answer simple questions.",
     "steps": [
       {
         "match": [
