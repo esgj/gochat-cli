@@ -27,7 +27,7 @@ func Run(intents []model.Intent, classes []model.IntentClass) {
 	var wordScore float32
 
 	go func() {
-		// Print out the first intent response
+		// Output the first intent default response
 		response <- currentIntent.DefaultResponse
 
 		for {
@@ -37,7 +37,7 @@ func Run(intents []model.Intent, classes []model.IntentClass) {
 				currentIntent = GetIntent(class, intents)
 			}
 
-			time.Sleep(time.Second)
+			time.Sleep(time.Millisecond * 500)
 
 			if res != "" {
 				response <- res
@@ -78,7 +78,6 @@ func Run(intents []model.Intent, classes []model.IntentClass) {
 				if (newIntent.Intent != model.IntentClass{}.Intent && currentIntent.Name != newIntent.Intent) {
 					class = newIntent
 					prevMessage = data
-					fmt.Println(class)
 				} else {
 					rand.Seed(time.Now().Unix())
 					randIndex := rand.Intn(len(currentIntent.Steps[class.CurrentStep].Fallback))
