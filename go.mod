@@ -1,3 +1,3 @@
-module github.com/esgj/gochat
+module github.com/esgj/gochatcli
 
 go 1.20
