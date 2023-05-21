@@ -1,8 +1,9 @@
 package model
 
 type Intent struct {
-	Name  string       `json:"name"`
-	Steps []IntentStep `json:"steps"`
+	Name            string       `json:"name"`
+	DefaultResponse string       `json:"defaultResponse"`
+	Steps           []IntentStep `json:"steps"`
 }
 
 type IntentStep struct {
@@ -12,7 +13,7 @@ type IntentStep struct {
 }
 
 type IntentClass struct {
-	Intent string   `json:"intent"`
-	Words  []string `json:"words"`
-	CurrentStep int `json:"currentStep"`
+	Intent      string   `json:"intent"`
+	Words       []string `json:"words"`
+	CurrentStep int      `json:"currentStep"`
 }

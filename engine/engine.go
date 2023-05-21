@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/esgj/gochat/model"
@@ -16,62 +17,79 @@ var currentIntent model.IntentClass
 func Run(intents []model.Intent, classes []model.IntentClass) {
 	reader := bufio.NewReader(os.Stdin)
 	class := classes[0]
-	var previousInput string
+	message := make(chan string)
+	response := make(chan string)
+	currentIntent := GetIntent(class, intents)
+	wg := new(sync.WaitGroup)
+	wg.Add(1)
+	var res string
+	var prevMessage string
+	var wordScore float32
 
-	for {
-		currentIntent := GetIntent(class, intents)
-
-		if previousInput == "" {
-			// Print out the first intent response
-			fmt.Printf("%v %v   (Step: %d Topic: %v)\r\n", "🤖", currentIntent.Steps[0].Respones[0], class.CurrentStep, class.Intent)
-			// Go to next step
-			class.CurrentStep++
-		}
+	go func() {
+		// Print out the first intent response
+		response <- currentIntent.DefaultResponse
 
 		for {
-			var data string
-			var response string
+			wg.Wait()
 
-			if previousInput == "" {
-				if d, err := reader.ReadString('\n'); err != nil {
-					log.Fatal(err)
-				} else {
-					data = d
-				}
+			if currentIntent.Name != class.Intent {
+				currentIntent = GetIntent(class, intents)
+			}
+
+			time.Sleep(time.Second)
+
+			if res != "" {
+				response <- res
+				res = ""
+				wg.Add(1)
+				continue
+			}
+
+			if prevMessage != "" {
+				message <- prevMessage
+				prevMessage = ""
+				wg.Add(1)
+				continue
+			}
+
+			if data, err := reader.ReadString('\n'); err != nil {
+				log.Fatal(err)
 			} else {
-				data = previousInput
-				previousInput = ""
+				message <- data
+				wg.Add(1)
 			}
-			
+		}
 
-			if len(currentIntent.Steps) == class.CurrentStep {
-				rand.Seed(time.Now().Unix())
-				class.CurrentStep = rand.Intn(len(currentIntent.Steps))
-				if (class.CurrentStep == 0 && currentIntent.Name == intents[0].Name) {
-					class.CurrentStep++
-				}
-			}
+	}()
 
+	for {
+		select {
+		case data := <-message:
 			for index, keyword := range currentIntent.Steps[class.CurrentStep].Match {
-				if CompareTwoStrings(keyword, data) >= 0.5 {
-					response = currentIntent.Steps[class.CurrentStep].Respones[index]
+				if wordScore = CompareTwoStrings(keyword, data); wordScore >= 0.5 {
+					res = currentIntent.Steps[class.CurrentStep].Respones[index]
 					break
 				}
 			}
 
-			if response == "" {
+			if res == "" {
 				newIntent := MatchNewIntent(data, classes)
-				if (newIntent.Intent != model.IntentClass{}.Intent) {
+				if (newIntent.Intent != model.IntentClass{}.Intent && currentIntent.Name != newIntent.Intent) {
 					class = newIntent
-					previousInput = data
-					break
+					prevMessage = data
+					fmt.Println(class)
+				} else {
+					rand.Seed(time.Now().Unix())
+					randIndex := rand.Intn(len(currentIntent.Steps[class.CurrentStep].Fallback))
+					res = currentIntent.Steps[class.CurrentStep].Fallback[randIndex]
 				}
-				rand.Seed(time.Now().Unix())
-				randIndex := rand.Intn(len(currentIntent.Steps[class.CurrentStep].Fallback))
-				response = currentIntent.Steps[class.CurrentStep].Fallback[randIndex]
 			}
-
-			fmt.Printf("%v %v   (Step: %d Topic: %v)\r\n", "🤖", response, class.CurrentStep, class.Intent)
+			wg.Done()
+		case chatResponse := <-response:
+			// fmt.Printf("%v %v   (Step: %d Topic: %v WordScore: %f)\r\n", "🤖", chatResponse, class.CurrentStep, class.Intent, wordScore)
+			fmt.Printf("%v %v\r\n", "🤖", chatResponse)
+			wg.Done()
 		}
 	}
 }

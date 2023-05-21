@@ -1,14 +1,8 @@
 [
   {
     "name": "greeting",
+    "defaultResponse": "Hello, I'm the Appio Chatbot! Not very clever but I can answer simple questions.",
     "steps": [
-      {
-        "match": [],
-        "responses": [
-          "Hello, I'm the Appio Chatbot! Not very clever but I can answer simple questions."
-        ],
-        "fallback": []
-      },
       {
         "match": [
           "hi",
